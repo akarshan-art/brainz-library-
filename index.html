@@ -27,16 +27,21 @@
   .layout { display: flex; min-height: 100vh; }
   .sidebar {
     width: 240px; background: #ffffff; border-right: 1px solid var(--border);
-    display: flex; flex-direction: column; padding: 28px 0; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100;
+    display: flex; flex-direction: column; padding: 0; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100;
+    overflow: hidden;
   }
-  .logo { padding: 0 24px 28px; border-bottom: 1px solid var(--border); }
+  .logo { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
   .logo-title { font-family: 'Playfair Display', serif; font-size: 1.35rem; color: var(--accent); letter-spacing: 0.5px; }
   .logo-sub { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
-  .nav { padding: 20px 12px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+  .nav { padding: 12px 12px 20px; flex: 1; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; overflow-x: hidden; }
+  .nav::-webkit-scrollbar { width: 4px; }
+  .nav::-webkit-scrollbar-track { background: transparent; }
+  .nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .nav::-webkit-scrollbar-thumb:hover { background: var(--muted); }
   .nav-btn {
-    display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: 9px;
-    background: none; border: none; color: var(--muted); cursor: pointer; font-size: 0.88rem; font-family: 'DM Sans', sans-serif;
-    font-weight: 500; transition: all 0.18s; text-align: left; width: 100%;
+    display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px;
+    background: none; border: none; color: var(--muted); cursor: pointer; font-size: 0.85rem; font-family: 'DM Sans', sans-serif;
+    font-weight: 500; transition: all 0.15s; text-align: left; width: 100%; flex-shrink: 0;
   }
   .nav-btn:hover { background: var(--surface2); color: var(--text); }
   .nav-btn.active { background: var(--accent); color: #111; }
@@ -184,6 +189,20 @@
     color:var(--text); font-family:monospace; }
   .sync-url-input:focus { outline:none; border-color:var(--accent2); }
 
+  /* ===== DAY SHEET ===== */
+  .ds-tab {
+    padding: 6px 14px; border-radius: 6px; border: none; cursor: pointer;
+    font-size: 0.82rem; font-weight: 500; font-family: 'DM Sans', sans-serif;
+    background: none; color: var(--muted); transition: all 0.15s;
+  }
+  .ds-tab:hover { color: var(--text); }
+  .ds-tab.active-tab { background: var(--accent2); color: #fff; }
+  .daysheet-num {
+    color: var(--accent2); font-weight: 700; cursor: pointer; text-align: center;
+    display: block;
+  }
+  .daysheet-num:hover { text-decoration: underline; }
+
   /* ===== LOGIN SCREEN ===== */
   .login-screen {
     position: fixed; inset: 0; background: linear-gradient(135deg,#fff8e7 0%,#fff 60%,#e8f0ff 100%);
@@ -202,6 +221,7 @@
   .user-badge {
     display: flex; align-items: center; gap: 10px; padding: 10px 16px;
     background: var(--surface2); border-radius: 10px; margin: 0 12px 6px;
+    flex-shrink: 0;
   }
   .user-avatar { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.85rem; font-weight:700; color:#fff; flex-shrink:0; }
   .user-info { flex:1; }
@@ -212,7 +232,7 @@
   .role-tag { display:inline-block; padding:2px 8px; border-radius:20px; font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
   .role-admin { background:#dbeafe; color:#1d4ed8; }
   .role-operator { background:#dcfce7; color:#166534; }
-  .nav-section-label { padding: 14px 16px 4px; font-size:0.68rem; text-transform:uppercase; letter-spacing:1px; color:var(--muted); font-weight:700; }
+  .nav-section-label { padding: 10px 16px 3px; font-size:0.65rem; text-transform:uppercase; letter-spacing:1px; color:var(--muted); font-weight:700; flex-shrink:0; }
 
   /* Responsive */
   @media (max-width: 900px) {
@@ -284,7 +304,7 @@
     <div class="logo-title" style="font-size:1.05rem;color:#1a1f36;">Brainz Edu World</div>
     <div class="logo-sub">Library Management System</div>
   </div>
-  <div id="user-badge-area"></div>
+  <div id="user-badge-area" style="flex-shrink:0;"></div>
   <nav class="nav" id="main-nav">
     <!-- built dynamically by buildNav() -->
   </nav>
@@ -319,11 +339,14 @@
 <!-- DASHBOARD -->
 <div class="page active" id="page-dashboard">
   <div class="page-title">Dashboard</div>
-  <div class="page-sub">Library overview at a glance</div>
-  <div class="stats-grid">
+  <div class="page-sub">Brainz Edu World — Library Management System</div>
+
+  <!-- STAT CARDS ROW -->
+  <div class="stats-grid" style="margin-bottom:24px;">
     <div class="stat-card blue">
       <div class="stat-num" id="stat-total-books">0</div>
-      <div class="stat-label">Total Books</div>
+      <div class="stat-label">Book Titles</div>
+      <div id="stat-total-copies" style="font-size:0.72rem;color:var(--muted);margin-top:2px;"></div>
     </div>
     <div class="stat-card yellow">
       <div class="stat-num" id="stat-issued">0</div>
@@ -339,6 +362,57 @@
     </div>
   </div>
 
+  <!-- LIBRARY DAY SHEET -->
+  <div class="card" style="margin-bottom:24px;">
+    <div class="card-header" style="flex-wrap:wrap;gap:12px;">
+      <span class="card-title" style="font-size:1rem;">📋 Library Day Sheet</span>
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-left:auto;">
+        <!-- Date filter tabs -->
+        <div style="display:flex;gap:0;background:#f0f3fa;border-radius:8px;padding:3px;">
+          <button id="ds-tab-today" class="ds-tab active-tab" onclick="setDaySheet('today')">Today</button>
+          <button id="ds-tab-7"     class="ds-tab" onclick="setDaySheet('7')">Last 7 days</button>
+          <button id="ds-tab-30"    class="ds-tab" onclick="setDaySheet('30')">This 30 days</button>
+          <button id="ds-tab-range" class="ds-tab" onclick="setDaySheet('range')">Between Dates</button>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="exportDaySheet()">⬇ Excel</button>
+      </div>
+    </div>
+
+    <!-- Date range picker (hidden by default) -->
+    <div id="ds-range-row" style="display:none;padding:12px 22px;background:#f8f9fc;border-bottom:1px solid var(--border);gap:12px;" class="flex items-center">
+      <div class="form-group" style="margin:0;flex-direction:row;align-items:center;gap:8px;">
+        <label style="white-space:nowrap;">From</label>
+        <input type="date" id="ds-from" onchange="renderDaySheet()" style="width:160px;">
+      </div>
+      <div class="form-group" style="margin:0;flex-direction:row;align-items:center;gap:8px;">
+        <label style="white-space:nowrap;">To</label>
+        <input type="date" id="ds-to" onchange="renderDaySheet()" style="width:160px;">
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="width:60px;">Sl.No</th>
+          <th>Status</th>
+          <th style="width:130px;text-align:center;">Total Books</th>
+          <th style="width:110px;text-align:center;">Students</th>
+          <th style="width:90px;text-align:center;">Staff</th>
+        </tr>
+      </thead>
+      <tbody id="daysheet-body"></tbody>
+      <tfoot>
+        <tr style="background:#f0f3fa;font-weight:700;border-top:2px solid var(--border);">
+          <td colspan="2" style="padding:12px 16px;text-align:right;color:var(--muted);">Total</td>
+          <td id="ds-total-books" style="padding:12px 16px;text-align:center;">0</td>
+          <td id="ds-total-students" style="padding:12px 16px;text-align:center;">0</td>
+          <td style="padding:12px 16px;text-align:center;">0</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <!-- BOTTOM ROW: Recent Issues + Low Stock -->
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
     <div class="card">
       <div class="card-header"><span class="card-title">Recent Issues</span></div>
@@ -801,10 +875,213 @@
   </div>
 </div>
 
+<!-- RENEW PAGE -->
+<div class="page" id="page-renew">
+  <div class="page-title">Renew Book</div>
+  <div class="page-sub">Extend due date for currently issued books</div>
+  <div class="flex gap-3 mb-4 items-center">
+    <div class="search-bar"><span class="search-icon">🔍</span>
+      <input type="text" id="renew-search" placeholder="Search by student name, admission no, or book…" oninput="renderRenewList()">
+    </div>
+  </div>
+  <div class="card">
+    <table>
+      <thead><tr><th>Student</th><th>Class</th><th>Book</th><th>Issued</th><th>Current Due</th><th>Status</th><th>New Due Date</th><th>Action</th></tr></thead>
+      <tbody id="renew-table"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- LOCATION PAGE -->
+<div class="page" id="page-location">
+  <div class="flex items-center justify-between mb-4">
+    <div><div class="page-title">Location Resources</div><div class="page-sub">Manage shelf, rack and room locations</div></div>
+    <button class="btn btn-primary" onclick="openModal('addLocationModal')">＋ Add Location</button>
+  </div>
+  <div class="card">
+    <table>
+      <thead><tr><th>Location Code</th><th>Room / Area</th><th>Shelf</th><th>Rack</th><th>Capacity</th><th>Actions</th></tr></thead>
+      <tbody id="location-table"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- BARCODE PAGE -->
+<div class="page" id="page-barcode">
+  <div class="page-title">Generate Library Barcodes</div>
+  <div class="page-sub">Print barcodes for books and student ID cards</div>
+  <div style="display:grid;grid-template-columns:280px 1fr;gap:20px;">
+    <div class="card" style="padding:20px;">
+      <div style="font-weight:700;margin-bottom:14px;">Barcode Settings</div>
+      <div class="form-group mb-4">
+        <label>Type</label>
+        <select id="barcode-type" onchange="renderBarcodePreview()">
+          <option value="books">Books (by HSN Code)</option>
+          <option value="students">Students (by Adm. No)</option>
+        </select>
+      </div>
+      <div class="form-group mb-4">
+        <label>Filter / Search</label>
+        <input type="text" id="barcode-search" placeholder="Search…" oninput="renderBarcodeList()">
+      </div>
+      <div class="form-group mb-4">
+        <label>Select All</label>
+        <div style="display:flex;gap:8px;margin-top:4px;">
+          <button class="btn btn-secondary btn-sm" onclick="barcodeSelectAll()">Select All</button>
+          <button class="btn btn-secondary btn-sm" onclick="barcodeClearAll()">Clear</button>
+        </div>
+      </div>
+      <div class="bulk-list" id="barcode-list" style="max-height:300px;"></div>
+    </div>
+    <div>
+      <div class="card" style="padding:20px;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <div style="font-weight:700;">Preview & Print</div>
+          <button class="btn btn-primary" onclick="printBarcodes()">🖨️ Print Barcodes</button>
+        </div>
+        <div id="barcode-preview" style="display:flex;flex-wrap:wrap;gap:12px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PUBLISHERS PAGE -->
+<div class="page" id="page-publishers">
+  <div class="flex items-center justify-between mb-4">
+    <div><div class="page-title">Library Publishers</div><div class="page-sub">Manage book publishers</div></div>
+    <button class="btn btn-primary" onclick="openModal('addPublisherModal')">＋ Add Publisher</button>
+  </div>
+  <div class="card">
+    <table>
+      <thead><tr><th>Publisher Name</th><th>Contact</th><th>Email</th><th>City</th><th>Books Count</th><th>Actions</th></tr></thead>
+      <tbody id="publishers-table"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- FEES PAGE -->
+<div class="page" id="page-fees">
+  <div class="flex items-center justify-between mb-4">
+    <div><div class="page-title">Library Fee Receipts</div><div class="page-sub">Record and manage library fines & fees</div></div>
+    <button class="btn btn-primary" onclick="openModal('addFeeModal')">＋ Add Fee Entry</button>
+  </div>
+  <div class="flex gap-3 mb-4 items-center">
+    <div class="search-bar"><span class="search-icon">🔍</span>
+      <input type="text" id="fees-search" placeholder="Search by student or reason…" oninput="renderFeesTable()">
+    </div>
+    <select id="fees-status-filter" onchange="renderFeesTable()" style="width:140px;">
+      <option value="">All Status</option>
+      <option value="pending">Pending</option>
+      <option value="paid">Paid</option>
+      <option value="waived">Waived</option>
+    </select>
+    <button class="btn btn-secondary btn-sm" onclick="exportFeesCSV()">⬇ Export</button>
+  </div>
+  <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px;">
+    <div class="stat-card red"><div class="stat-num" id="fees-total-pending">₹0</div><div class="stat-label">Total Pending</div></div>
+    <div class="stat-card green"><div class="stat-num" id="fees-total-collected">₹0</div><div class="stat-label">Total Collected</div></div>
+    <div class="stat-card yellow"><div class="stat-num" id="fees-total-waived">₹0</div><div class="stat-label">Total Waived</div></div>
+  </div>
+  <div class="card">
+    <table>
+      <thead><tr><th>Receipt No</th><th>Student</th><th>Class</th><th>Reason</th><th>Amount</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody id="fees-table"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- VENDORS PAGE -->
+<div class="page" id="page-vendors">
+  <div class="flex items-center justify-between mb-4">
+    <div><div class="page-title">Library Vendors</div><div class="page-sub">Manage book suppliers and vendors</div></div>
+    <button class="btn btn-primary" onclick="openModal('addVendorModal')">＋ Add Vendor</button>
+  </div>
+  <div class="card">
+    <table>
+      <thead><tr><th>Vendor Name</th><th>Contact Person</th><th>Phone</th><th>Email</th><th>Category</th><th>Actions</th></tr></thead>
+      <tbody id="vendors-table"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- RESERVATIONS PAGE -->
+<div class="page" id="page-reservations">
+  <div class="flex items-center justify-between mb-4">
+    <div><div class="page-title">Book Reservations</div><div class="page-sub">Students can reserve books currently unavailable</div></div>
+    <button class="btn btn-primary" onclick="openModal('addReservationModal')">＋ New Reservation</button>
+  </div>
+  <div class="flex gap-3 mb-4 items-center">
+    <div class="search-bar"><span class="search-icon">🔍</span>
+      <input type="text" id="res-search" placeholder="Search reservations…" oninput="renderReservations()">
+    </div>
+    <select id="res-filter" onchange="renderReservations()" style="width:140px;">
+      <option value="">All Status</option>
+      <option value="pending">Pending</option>
+      <option value="fulfilled">Fulfilled</option>
+      <option value="cancelled">Cancelled</option>
+    </select>
+  </div>
+  <div class="card">
+    <table>
+      <thead><tr><th>Res. No</th><th>Student</th><th>Class</th><th>Book</th><th>Reserved On</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody id="reservations-table"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- CATEGORIES PAGE -->
+<div class="page" id="page-categories">
+  <div class="page-title">Categories & Languages</div>
+  <div class="page-sub">Manage book category types, categories, and languages</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;">
+    <!-- Category Types -->
+    <div class="card" style="padding:20px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div style="font-weight:700;">Category Types</div>
+        <button class="btn btn-primary btn-sm" onclick="addCatType()">＋ Add</button>
+      </div>
+      <div id="cat-types-list"></div>
+    </div>
+    <!-- Categories -->
+    <div class="card" style="padding:20px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div style="font-weight:700;">Categories</div>
+        <button class="btn btn-primary btn-sm" onclick="addCategory()">＋ Add</button>
+      </div>
+      <div id="categories-list"></div>
+    </div>
+    <!-- Languages -->
+    <div class="card" style="padding:20px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div style="font-weight:700;">Languages</div>
+        <button class="btn btn-primary btn-sm" onclick="addLanguage()">＋ Add</button>
+      </div>
+      <div id="languages-list"></div>
+    </div>
+  </div>
+</div>
+
 </main>
 </div>
 
 <!-- MODALS -->
+
+<!-- Day Sheet Detail Modal -->
+<div class="modal-backdrop" id="dsDetailModal">
+  <div class="modal" style="width:700px;max-width:95vw;">
+    <div class="modal-header">
+      <span class="modal-title" id="dsDetailTitle">Records</span>
+      <button class="modal-close" onclick="closeModal('dsDetailModal')">✕</button>
+    </div>
+    <div style="max-height:400px;overflow-y:auto;">
+      <table>
+        <thead><tr><th>Student</th><th>Class</th><th>Book</th><th>Issue Date</th><th>Due Date</th><th>Status</th></tr></thead>
+        <tbody id="dsDetailBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 <!-- Add Book -->
 <div class="modal-backdrop" id="addBookModal">
   <div class="modal">
@@ -884,6 +1161,139 @@
     <div class="flex gap-3 mt-6">
       <button class="btn btn-primary" onclick="addStudent()">Add Student</button>
       <button class="btn btn-secondary" onclick="closeModal('addStudentModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Add Location Modal -->
+<div class="modal-backdrop" id="addLocationModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Add Location Resource</span>
+      <button class="modal-close" onclick="closeModal('addLocationModal')">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label>Location Code *</label><input type="text" id="loc-code" placeholder="e.g. A-01-R1"></div>
+      <div class="form-group"><label>Room / Area *</label><input type="text" id="loc-room" placeholder="e.g. Main Hall"></div>
+      <div class="form-group"><label>Shelf No</label><input type="text" id="loc-shelf" placeholder="e.g. Shelf A"></div>
+      <div class="form-group"><label>Rack No</label><input type="text" id="loc-rack" placeholder="e.g. Rack 1"></div>
+      <div class="form-group"><label>Capacity (books)</label><input type="number" id="loc-capacity" placeholder="100"></div>
+      <div class="form-group"><label>Notes</label><input type="text" id="loc-notes" placeholder="Optional notes"></div>
+    </div>
+    <div class="flex gap-3 mt-6">
+      <button class="btn btn-primary" onclick="addLocation()">Add Location</button>
+      <button class="btn btn-secondary" onclick="closeModal('addLocationModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Publisher Modal -->
+<div class="modal-backdrop" id="addPublisherModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Add Publisher</span>
+      <button class="modal-close" onclick="closeModal('addPublisherModal')">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label>Publisher Name *</label><input type="text" id="pub-name" placeholder="Publisher name"></div>
+      <div class="form-group"><label>Contact Person</label><input type="text" id="pub-contact" placeholder="Contact name"></div>
+      <div class="form-group"><label>Phone</label><input type="text" id="pub-phone" placeholder="Phone number"></div>
+      <div class="form-group"><label>Email</label><input type="text" id="pub-email" placeholder="Email address"></div>
+      <div class="form-group"><label>City</label><input type="text" id="pub-city" placeholder="City"></div>
+      <div class="form-group"><label>Website</label><input type="text" id="pub-website" placeholder="www.publisher.com"></div>
+    </div>
+    <div class="flex gap-3 mt-6">
+      <button class="btn btn-primary" onclick="addPublisher()">Add Publisher</button>
+      <button class="btn btn-secondary" onclick="closeModal('addPublisherModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Vendor Modal -->
+<div class="modal-backdrop" id="addVendorModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Add Vendor</span>
+      <button class="modal-close" onclick="closeModal('addVendorModal')">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label>Vendor Name *</label><input type="text" id="ven-name" placeholder="Vendor name"></div>
+      <div class="form-group"><label>Contact Person</label><input type="text" id="ven-contact" placeholder="Contact name"></div>
+      <div class="form-group"><label>Phone *</label><input type="text" id="ven-phone" placeholder="Phone number"></div>
+      <div class="form-group"><label>Email</label><input type="text" id="ven-email" placeholder="Email"></div>
+      <div class="form-group"><label>Category</label>
+        <select id="ven-cat">
+          <option>Books Supplier</option><option>Stationery</option><option>Digital Resources</option><option>Other</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Address</label><input type="text" id="ven-address" placeholder="Address"></div>
+    </div>
+    <div class="flex gap-3 mt-6">
+      <button class="btn btn-primary" onclick="addVendor()">Add Vendor</button>
+      <button class="btn btn-secondary" onclick="closeModal('addVendorModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Fee Modal -->
+<div class="modal-backdrop" id="addFeeModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Add Fee Receipt Entry</span>
+      <button class="modal-close" onclick="closeModal('addFeeModal')">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Student *</label>
+        <select id="fee-student"><option value="">-- Select Student --</option></select>
+      </div>
+      <div class="form-group">
+        <label>Fee Type *</label>
+        <select id="fee-type">
+          <option>Late Return Fine</option><option>Lost Book Fine</option><option>Damaged Book Fine</option>
+          <option>Membership Fee</option><option>Other</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Amount (₹) *</label><input type="number" id="fee-amount" placeholder="0.00" min="0" step="0.01"></div>
+      <div class="form-group"><label>Date *</label><input type="date" id="fee-date"></div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="fee-status"><option value="pending">Pending</option><option value="paid">Paid</option><option value="waived">Waived</option></select>
+      </div>
+      <div class="form-group"><label>Book Reference</label><input type="text" id="fee-book-ref" placeholder="Book title or HSN (optional)"></div>
+    </div>
+    <div class="form-group mt-4"><label>Remarks</label><input type="text" id="fee-remarks" placeholder="Additional notes"></div>
+    <div class="flex gap-3 mt-6">
+      <button class="btn btn-primary" onclick="addFeeEntry()">Save Receipt</button>
+      <button class="btn btn-secondary" onclick="closeModal('addFeeModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Reservation Modal -->
+<div class="modal-backdrop" id="addReservationModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">New Book Reservation</span>
+      <button class="modal-close" onclick="closeModal('addReservationModal')">✕</button>
+    </div>
+    <div class="form-grid-2">
+      <div class="form-group">
+        <label>Student *</label>
+        <select id="res-student"><option value="">-- Select Student --</option></select>
+      </div>
+      <div class="form-group">
+        <label>Book *</label>
+        <select id="res-book"><option value="">-- Select Book --</option></select>
+      </div>
+      <div class="form-group"><label>Reservation Date</label><input type="date" id="res-date"></div>
+      <div class="form-group"><label>Expected Date</label><input type="date" id="res-expected" placeholder="When needed by"></div>
+    </div>
+    <div class="form-group mt-4"><label>Notes</label><input type="text" id="res-notes" placeholder="Optional notes"></div>
+    <div class="flex gap-3 mt-6">
+      <button class="btn btn-primary" onclick="addReservation()">Reserve Book</button>
+      <button class="btn btn-secondary" onclick="closeModal('addReservationModal')">Cancel</button>
     </div>
   </div>
 </div>
@@ -1202,7 +1612,7 @@ function fmtDate(d) {
 function bookAvailable(bid) {
   const issued = records.filter(r => r.bookId === bid && r.status === 'issued').length;
   const book = books.find(b => b.id === bid);
-  return book ? book.total - issued : 0;
+  return book ? (parseInt(book.total) || 0) - issued : 0;
 }
 function toast(msg, type = 'success') {
   const el = document.createElement('div');
@@ -1222,7 +1632,15 @@ function showPage(id) {
   document.querySelectorAll('.nav-btn').forEach(b => {
     if (b.textContent.trim().toLowerCase().includes(id.replace('-', ' ').slice(0, 6))) b.classList.add('active');
   });
-  const renders = { dashboard: renderDashboard, books: renderBooks, students: renderStudents, records: renderRecords, returns: renderReturnList, bulk: renderBulkPage, import: ()=>{} };
+  const renders = {
+  dashboard: renderDashboard, books: renderBooks, students: renderStudents,
+  records: renderRecords, returns: renderReturnList, bulk: renderBulkPage,
+  import: ()=>{}, renew: renderRenewList, location: renderLocations,
+  publishers: renderPublishers, vendors: renderVendors, fees: renderFeesTable,
+  reservations: () => { populateReservationDropdowns(); renderReservations(); },
+  categories: renderCategories, barcode: renderBarcodeList,
+  languages: ()=>{}
+};
   if (renders[id]) renders[id]();
 }
 
@@ -1243,30 +1661,186 @@ document.querySelectorAll('.modal-backdrop').forEach(m => {
 
 // =================== DASHBOARD ===================
 function renderDashboard() {
-  const totalBooks = books.reduce((s, b) => s + b.total, 0);
-  const issued = records.filter(r => r.status === 'issued').length;
+  // Stat cards
+  const totalTitles = books.length;
+  const totalCopies = books.reduce((s, b) => s + (parseInt(b.total) || 0), 0);
+  const issued  = records.filter(r => r.status === 'issued').length;
   const overdue = records.filter(r => r.status === 'issued' && daysLeft(r.due) < 0).length;
-  document.getElementById('stat-total-books').textContent = totalBooks;
+  document.getElementById('stat-total-books').textContent = totalTitles;
+  const ce = document.getElementById('stat-total-copies');
+  if (ce) ce.textContent = totalCopies + ' total copies';
   document.getElementById('stat-issued').textContent = issued;
   document.getElementById('stat-students').textContent = students.length;
   document.getElementById('stat-overdue').textContent = overdue;
 
-  const recentIssues = records.filter(r => r.status === 'issued').slice(-5).reverse();
+  // Recent issues
+  const recentIssues = records.filter(r => r.status === 'issued').slice(-6).reverse();
   const ri = document.getElementById('dash-recent-issues');
-  ri.innerHTML = recentIssues.length ? recentIssues.map(r => {
+  if (ri) ri.innerHTML = recentIssues.length ? recentIssues.map(r => {
     const s = students.find(x => x.id === r.studentId);
     const b = books.find(x => x.id === r.bookId);
     const dl = daysLeft(r.due);
-    return `<tr><td>${s?.name || '?'}</td><td>${b?.title || '?'}</td><td>${fmtDate(r.due)}</td>
-    <td><span class="badge ${dl < 0 ? 'badge-red' : dl <= 3 ? 'badge-yellow' : 'badge-green'}">${dl < 0 ? 'Overdue' : dl <= 3 ? 'Due Soon' : 'Active'}</span></td></tr>`;
+    return `<tr><td>${s?.name||'?'}</td><td>${b?.title||'?'}</td><td>${fmtDate(r.due)}</td>
+    <td><span class="badge ${dl<0?'badge-red':dl<=3?'badge-yellow':'badge-green'}">${dl<0?'Overdue':dl<=3?'Due Soon':'Active'}</span></td></tr>`;
   }).join('') : '<tr><td colspan="4" class="empty-state">No active issues</td></tr>';
 
-  const lowStock = books.filter(b => bookAvailable(b.id) <= 2).slice(0, 6);
+  // Low stock
+  const lowStock = books.filter(b => bookAvailable(b.id) <= 2).slice(0, 8);
   const ls = document.getElementById('dash-low-stock');
-  ls.innerHTML = lowStock.length ? lowStock.map(b =>
-    `<tr><td>${b.title}</td><td style="color:${bookAvailable(b.id) === 0 ? 'var(--danger)' : 'var(--accent)'};">${bookAvailable(b.id)}</td><td>${b.total}</td></tr>`
+  if (ls) ls.innerHTML = lowStock.length ? lowStock.map(b =>
+    `<tr><td>${b.title}</td>
+    <td style="color:${bookAvailable(b.id)===0?'var(--danger)':'var(--accent)'};">${bookAvailable(b.id)}</td>
+    <td>${parseInt(b.total)||0}</td></tr>`
   ).join('') : '<tr><td colspan="3" class="empty-state">All books well stocked ✅</td></tr>';
+
+  // Day sheet
+  renderDaySheet();
 }
+
+// ── DAY SHEET ──────────────────────────────────────────────
+let dsMode = 'today';
+
+function setDaySheet(mode) {
+  dsMode = mode;
+  // Update tab styles
+  ['today','7','30','range'].forEach(t => {
+    const el = document.getElementById('ds-tab-' + t);
+    if (el) el.classList.toggle('active-tab', t === mode);
+  });
+  // Show/hide date range row
+  const rangeRow = document.getElementById('ds-range-row');
+  if (rangeRow) rangeRow.style.display = mode === 'range' ? 'flex' : 'none';
+  renderDaySheet();
+}
+
+function getDsDateRange() {
+  const t = today();
+  if (dsMode === 'today') return { from: t, to: t };
+  if (dsMode === '7') {
+    const d = new Date(); d.setDate(d.getDate() - 6);
+    return { from: d.toISOString().slice(0,10), to: t };
+  }
+  if (dsMode === '30') {
+    const d = new Date(); d.setDate(d.getDate() - 29);
+    return { from: d.toISOString().slice(0,10), to: t };
+  }
+  if (dsMode === 'range') {
+    return {
+      from: document.getElementById('ds-from')?.value || t,
+      to:   document.getElementById('ds-to')?.value   || t
+    };
+  }
+  return { from: t, to: t };
+}
+
+function inRange(dateStr, from, to) {
+  return dateStr >= from && dateStr <= to;
+}
+
+function renderDaySheet() {
+  const { from, to } = getDsDateRange();
+  const label = dsMode === 'today' ? 'Today (' + fmtDate(today()) + ')' :
+                dsMode === '7'     ? 'Last 7 Days' :
+                dsMode === '30'    ? 'This 30 Days' :
+                'Between ' + fmtDate(from) + ' – ' + fmtDate(to);
+
+  // Row 1: Books Issued in range
+  const issuedRecs  = records.filter(r => inRange(r.issueDate, from, to));
+  const issuedBooks = issuedRecs.length;
+  const issuedStuds = new Set(issuedRecs.map(r => r.studentId)).size;
+
+  // Row 2: Books Returned in range
+  const returnedRecs  = records.filter(r => r.status === 'returned' && r.returnDate && inRange(r.returnDate, from, to));
+  const returnedBooks = returnedRecs.length;
+  const returnedStuds = new Set(returnedRecs.map(r => r.studentId)).size;
+
+  // Row 3: To be returned on the END date of range (due = to date)
+  const dueRecs  = records.filter(r => r.status === 'issued' && r.due === to);
+  const dueBooks = dueRecs.length;
+  const dueStuds = new Set(dueRecs.map(r => r.studentId)).size;
+
+  // Row 4: Overdue as of end date
+  const overdueRecs  = records.filter(r => r.status === 'issued' && r.due < to);
+  const overdueBooks = overdueRecs.length;
+  const overdueStuds = new Set(overdueRecs.map(r => r.studentId)).size;
+
+  // Row 5: Total under issue as on end date (all issued, not returned)
+  const underIssueRecs  = records.filter(r => r.status === 'issued');
+  const underIssueBooks = underIssueRecs.length;
+  const underIssueStuds = new Set(underIssueRecs.map(r => r.studentId)).size;
+
+  const rows = [
+    { sl:1, label:'Books Issued',                               extra: label,         books: issuedBooks,     studs: issuedStuds,     recs: issuedRecs,     color:'var(--accent2)' },
+    { sl:2, label:'Books Returned',                             extra: label,         books: returnedBooks,   studs: returnedStuds,   recs: returnedRecs,   color:'var(--success)' },
+    { sl:3, label:'To be Returned on',                          extra: fmtDate(to),   books: dueBooks,        studs: dueStuds,        recs: dueRecs,        color:'var(--accent)' },
+    { sl:4, label:'OverDue Returns on',                         extra: fmtDate(to),   books: overdueBooks,    studs: overdueStuds,    recs: overdueRecs,    color:'var(--danger)' },
+    { sl:5, label:'Total Books under Issue as on date and time (including today issued books)', extra:'', books: underIssueBooks, studs: underIssueStuds, recs: underIssueRecs, color:'var(--text)' },
+  ];
+
+  const tbody = document.getElementById('daysheet-body');
+  if (!tbody) return;
+  tbody.innerHTML = rows.map(row => `
+    <tr>
+      <td style="text-align:center;color:var(--muted);">${row.sl}</td>
+      <td style="padding:13px 16px;">
+        ${row.label}
+        ${row.extra ? `<span style="color:${row.color};font-weight:600;"> ${row.extra}</span>` : ''}
+      </td>
+      <td style="text-align:center;">
+        <span class="daysheet-num" onclick="showDsDetail('${row.sl}')" style="color:${row.color};">${row.books}</span>
+      </td>
+      <td style="text-align:center;font-weight:600;">${row.studs}</td>
+      <td style="text-align:center;color:var(--muted);">0</td>
+    </tr>
+  `).join('');
+
+  // Update footer totals
+  const totalBks = issuedBooks + returnedBooks;
+  const totalSts = new Set([...issuedRecs, ...returnedRecs].map(r => r.studentId)).size;
+  const ft1 = document.getElementById('ds-total-books');
+  const ft2 = document.getElementById('ds-total-students');
+  if (ft1) ft1.textContent = totalBks;
+  if (ft2) ft2.textContent = totalSts;
+
+  // Store rows for detail popup
+  window._dsRows = rows;
+}
+
+function showDsDetail(sl) {
+  const row = (window._dsRows || []).find(r => r.sl == sl);
+  if (!row || !row.recs.length) { toast('No records for this entry', 'info'); return; }
+  // Build a mini popup
+  const details = row.recs.slice(0,20).map(r => {
+    const s = students.find(x => x.id === r.studentId);
+    const b = books.find(x => x.id === r.bookId);
+    return `<tr><td>${s?.name||'?'}</td><td>${s?.cls||'?'}</td><td>${b?.title||'?'}</td><td>${fmtDate(r.issueDate)}</td><td>${fmtDate(r.due)}</td><td><span class="badge ${r.status==='returned'?'badge-green':'badge-yellow'}">${r.status}</span></td></tr>`;
+  }).join('');
+  const modal = document.getElementById('dsDetailModal');
+  const title = document.getElementById('dsDetailTitle');
+  const tbody = document.getElementById('dsDetailBody');
+  if (title) title.textContent = row.label + (row.extra ? ' ' + row.extra : '') + ' (' + row.recs.length + ' records)';
+  if (tbody) tbody.innerHTML = details;
+  if (modal) modal.classList.add('open');
+}
+
+function exportDaySheet() {
+  const { from, to } = getDsDateRange();
+  const rows = [['Sl.No','Status','Total Books','Students','Staff']];
+  const data = [
+    [1,'Books Issued ('+fmtDate(from)+' to '+fmtDate(to)+')', records.filter(r=>inRange(r.issueDate,from,to)).length, new Set(records.filter(r=>inRange(r.issueDate,from,to)).map(r=>r.studentId)).size, 0],
+    [2,'Books Returned', records.filter(r=>r.status==='returned'&&r.returnDate&&inRange(r.returnDate,from,to)).length, 0, 0],
+    [3,'To be Returned on '+fmtDate(to), records.filter(r=>r.status==='issued'&&r.due===to).length, 0, 0],
+    [4,'OverDue Returns on '+fmtDate(to), records.filter(r=>r.status==='issued'&&r.due<to).length, 0, 0],
+    [5,'Total Books under Issue', records.filter(r=>r.status==='issued').length, new Set(records.filter(r=>r.status==='issued').map(r=>r.studentId)).size, 0],
+  ];
+  data.forEach(r => rows.push(r));
+  const csv = rows.map(r => r.map(c => '"'+(c||0)+'"').join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'library_daysheet_' + today() + '.csv'; a.click();
+  toast('Day sheet exported!');
+}
+
 
 // =================== BOOKS ===================
 function renderBooks() {
@@ -2318,6 +2892,496 @@ function downloadTemplate(type) {
 }
 
 
+
+// =================== NEW MODULES DATA ===================
+let locations    = JSON.parse(localStorage.getItem('lms_locations')    || '[]');
+let publishers   = JSON.parse(localStorage.getItem('lms_publishers')   || '[]');
+let vendors      = JSON.parse(localStorage.getItem('lms_vendors')      || '[]');
+let fees         = JSON.parse(localStorage.getItem('lms_fees')         || '[]');
+let reservations = JSON.parse(localStorage.getItem('lms_reservations') || '[]');
+let catTypes     = JSON.parse(localStorage.getItem('lms_cat_types')    || '["Science","Arts","Commerce","Mathematics","Language","General"]');
+let categories   = JSON.parse(localStorage.getItem('lms_categories')   || '["Fiction","Non-Fiction","Reference","Textbook","Magazine","Journal"]');
+let languages    = JSON.parse(localStorage.getItem('lms_languages')    || '["English","Hindi","Urdu","Sanskrit","Other"]');
+let nextFeeId    = parseInt(localStorage.getItem('lms_fid') || '1');
+let nextResId    = parseInt(localStorage.getItem('lms_rid2') || '1');
+
+function saveExtra() {
+  localStorage.setItem('lms_locations',    JSON.stringify(locations));
+  localStorage.setItem('lms_publishers',   JSON.stringify(publishers));
+  localStorage.setItem('lms_vendors',      JSON.stringify(vendors));
+  localStorage.setItem('lms_fees',         JSON.stringify(fees));
+  localStorage.setItem('lms_reservations', JSON.stringify(reservations));
+  localStorage.setItem('lms_cat_types',    JSON.stringify(catTypes));
+  localStorage.setItem('lms_categories',   JSON.stringify(categories));
+  localStorage.setItem('lms_languages',    JSON.stringify(languages));
+  localStorage.setItem('lms_fid',  nextFeeId);
+  localStorage.setItem('lms_rid2', nextResId);
+}
+
+// =================== RENEW ===================
+function renderRenewList() {
+  const q = (document.getElementById('renew-search')?.value || '').toLowerCase();
+  const issued = records.filter(r => r.status === 'issued');
+  const filtered = issued.filter(r => {
+    const s = students.find(x => x.id === r.studentId);
+    const b = books.find(x => x.id === r.bookId);
+    return !q || (s?.name.toLowerCase().includes(q) || s?.adm.toLowerCase().includes(q) || b?.title.toLowerCase().includes(q));
+  });
+  const tbody = document.getElementById('renew-table');
+  if (!tbody) return;
+  const defDate = new Date(); defDate.setDate(defDate.getDate() + 14);
+  const defVal = defDate.toISOString().slice(0,10);
+  tbody.innerHTML = filtered.length ? filtered.map(r => {
+    const s = students.find(x => x.id === r.studentId);
+    const b = books.find(x => x.id === r.bookId);
+    const dl = daysLeft(r.due);
+    return `<tr>
+      <td><strong>${s?.name || '?'}</strong></td>
+      <td>${s?.cls || '?'}</td>
+      <td>${b?.title || '?'}</td>
+      <td>${fmtDate(r.issueDate)}</td>
+      <td class="${dl < 0 ? 'overdue' : ''}">${fmtDate(r.due)}</td>
+      <td><span class="badge ${dl < 0 ? 'badge-red' : dl <= 3 ? 'badge-yellow' : 'badge-green'}">${dl < 0 ? 'Overdue' : 'Active'}</span></td>
+      <td><input type="date" id="renew-date-${r.id}" value="${defVal}" style="padding:5px 8px;font-size:0.82rem;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);"></td>
+      <td><button class="btn btn-success btn-sm" onclick="renewRecord('${r.id}')">🔄 Renew</button></td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="8"><div class="empty-state">No active issues found</div></td></tr>';
+}
+
+function renewRecord(rid) {
+  const r = records.find(x => x.id === rid);
+  if (!r) return;
+  const newDue = document.getElementById('renew-date-' + rid)?.value;
+  if (!newDue) return toast('Set a new due date', 'danger');
+  if (newDue <= r.due) return toast('New due date must be after current due date', 'danger');
+  r.due = newDue; r.remarks = (r.remarks || '') + ' | Renewed on ' + today();
+  save(); gasUpdateRecord(r);
+  renderRenewList(); renderDashboard();
+  toast('Book renewed until ' + fmtDate(newDue) + ' ✅');
+}
+
+// =================== LOCATION ===================
+function renderLocations() {
+  const tbody = document.getElementById('location-table');
+  if (!tbody) return;
+  tbody.innerHTML = locations.length ? locations.map(l =>
+    `<tr>
+      <td><span class="chip">${l.code}</span></td>
+      <td>${l.room}</td>
+      <td>${l.shelf || '—'}</td>
+      <td>${l.rack || '—'}</td>
+      <td>${l.capacity || '—'}</td>
+      <td class="action-row">
+        <button class="btn btn-danger btn-sm" onclick="deleteLocation('${l.id}')">🗑</button>
+      </td>
+    </tr>`
+  ).join('') : '<tr><td colspan="6"><div class="empty-state">No locations added yet</div></td></tr>';
+}
+
+function addLocation() {
+  const code = document.getElementById('loc-code').value.trim();
+  const room = document.getElementById('loc-room').value.trim();
+  if (!code || !room) return toast('Code and Room are required', 'danger');
+  locations.push({ id: uid(), code, room,
+    shelf: document.getElementById('loc-shelf').value.trim(),
+    rack: document.getElementById('loc-rack').value.trim(),
+    capacity: document.getElementById('loc-capacity').value,
+    notes: document.getElementById('loc-notes').value.trim()
+  });
+  saveExtra(); closeModal('addLocationModal'); renderLocations();
+  ['loc-code','loc-room','loc-shelf','loc-rack','loc-capacity','loc-notes'].forEach(id => document.getElementById(id).value = '');
+  toast('Location added!');
+}
+
+function deleteLocation(id) {
+  if (!confirm('Delete this location?')) return;
+  locations = locations.filter(l => l.id !== id);
+  saveExtra(); renderLocations();
+  toast('Location deleted');
+}
+
+// =================== PUBLISHERS ===================
+function renderPublishers() {
+  const tbody = document.getElementById('publishers-table');
+  if (!tbody) return;
+  tbody.innerHTML = publishers.length ? publishers.map(p => {
+    const bookCount = books.filter(b => b.publisher === p.id).length;
+    return `<tr>
+      <td><strong>${p.name}</strong></td>
+      <td>${p.contact || '—'}</td>
+      <td>${p.email || '—'}</td>
+      <td>${p.city || '—'}</td>
+      <td><span class="badge badge-blue">${bookCount}</span></td>
+      <td class="action-row">
+        <button class="btn btn-danger btn-sm" onclick="deletePublisher('${p.id}')">🗑</button>
+      </td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="6"><div class="empty-state">No publishers added yet</div></td></tr>';
+}
+
+function addPublisher() {
+  const name = document.getElementById('pub-name').value.trim();
+  if (!name) return toast('Publisher name required', 'danger');
+  publishers.push({ id: uid(), name,
+    contact: document.getElementById('pub-contact').value.trim(),
+    phone:   document.getElementById('pub-phone').value.trim(),
+    email:   document.getElementById('pub-email').value.trim(),
+    city:    document.getElementById('pub-city').value.trim(),
+    website: document.getElementById('pub-website').value.trim()
+  });
+  saveExtra(); closeModal('addPublisherModal'); renderPublishers();
+  ['pub-name','pub-contact','pub-phone','pub-email','pub-city','pub-website'].forEach(id => document.getElementById(id).value = '');
+  toast('Publisher added!');
+}
+
+function deletePublisher(id) {
+  if (!confirm('Delete this publisher?')) return;
+  publishers = publishers.filter(p => p.id !== id);
+  saveExtra(); renderPublishers();
+}
+
+// =================== VENDORS ===================
+function renderVendors() {
+  const tbody = document.getElementById('vendors-table');
+  if (!tbody) return;
+  tbody.innerHTML = vendors.length ? vendors.map(v =>
+    `<tr>
+      <td><strong>${v.name}</strong></td>
+      <td>${v.contact || '—'}</td>
+      <td>${v.phone || '—'}</td>
+      <td>${v.email || '—'}</td>
+      <td><span class="badge badge-blue">${v.cat}</span></td>
+      <td class="action-row">
+        <button class="btn btn-danger btn-sm" onclick="deleteVendor('${v.id}')">🗑</button>
+      </td>
+    </tr>`
+  ).join('') : '<tr><td colspan="6"><div class="empty-state">No vendors added yet</div></td></tr>';
+}
+
+function addVendor() {
+  const name = document.getElementById('ven-name').value.trim();
+  const phone = document.getElementById('ven-phone').value.trim();
+  if (!name || !phone) return toast('Name and phone required', 'danger');
+  vendors.push({ id: uid(), name,
+    contact: document.getElementById('ven-contact').value.trim(),
+    phone,
+    email:   document.getElementById('ven-email').value.trim(),
+    cat:     document.getElementById('ven-cat').value,
+    address: document.getElementById('ven-address').value.trim()
+  });
+  saveExtra(); closeModal('addVendorModal'); renderVendors();
+  ['ven-name','ven-contact','ven-phone','ven-email','ven-address'].forEach(id => document.getElementById(id).value = '');
+  toast('Vendor added!');
+}
+
+function deleteVendor(id) {
+  if (!confirm('Delete this vendor?')) return;
+  vendors = vendors.filter(v => v.id !== id);
+  saveExtra(); renderVendors();
+}
+
+// =================== FEES ===================
+function renderFeesTable() {
+  const q = (document.getElementById('fees-search')?.value || '').toLowerCase();
+  const st = document.getElementById('fees-status-filter')?.value || '';
+  const filtered = fees.filter(f => {
+    const s = students.find(x => x.id === f.studentId);
+    const matchQ = !q || (s?.name.toLowerCase().includes(q) || (f.type||'').toLowerCase().includes(q));
+    const matchS = !st || f.status === st;
+    return matchQ && matchS;
+  });
+  const tbody = document.getElementById('fees-table');
+  if (!tbody) return;
+  tbody.innerHTML = filtered.length ? filtered.reverse().map(f => {
+    const s = students.find(x => x.id === f.studentId);
+    const stCls = f.status === 'paid' ? 'badge-green' : f.status === 'waived' ? 'badge-yellow' : 'badge-red';
+    return `<tr>
+      <td><span class="chip">F${f.receiptNo}</span></td>
+      <td>${s?.name || '?'}</td>
+      <td>${s?.cls || '?'}</td>
+      <td>${f.type}</td>
+      <td><strong>₹${parseFloat(f.amount||0).toFixed(2)}</strong></td>
+      <td>${fmtDate(f.date)}</td>
+      <td><span class="badge ${stCls}">${f.status}</span></td>
+      <td class="action-row">
+        ${f.status === 'pending' ? `<button class="btn btn-success btn-sm" onclick="markFeePaid('${f.id}')">✓ Paid</button>
+        <button class="btn btn-secondary btn-sm" onclick="markFeeWaived('${f.id}')">Waive</button>` : ''}
+        <button class="btn btn-danger btn-sm" onclick="deleteFee('${f.id}')">🗑</button>
+      </td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="8"><div class="empty-state">No fee entries found</div></td></tr>';
+
+  // Update summary stats
+  const pending   = fees.filter(f=>f.status==='pending').reduce((s,f)=>s+parseFloat(f.amount||0),0);
+  const collected = fees.filter(f=>f.status==='paid').reduce((s,f)=>s+parseFloat(f.amount||0),0);
+  const waived    = fees.filter(f=>f.status==='waived').reduce((s,f)=>s+parseFloat(f.amount||0),0);
+  const fp = document.getElementById('fees-total-pending');
+  const fc = document.getElementById('fees-total-collected');
+  const fw = document.getElementById('fees-total-waived');
+  if (fp) fp.textContent = '₹' + pending.toFixed(2);
+  if (fc) fc.textContent = '₹' + collected.toFixed(2);
+  if (fw) fw.textContent = '₹' + waived.toFixed(2);
+}
+
+function addFeeEntry() {
+  const sid = document.getElementById('fee-student')?.value;
+  const amount = document.getElementById('fee-amount')?.value;
+  const date = document.getElementById('fee-date')?.value || today();
+  if (!sid) return toast('Select a student', 'danger');
+  if (!amount || parseFloat(amount) <= 0) return toast('Enter a valid amount', 'danger');
+  const entry = {
+    id: uid(), receiptNo: nextFeeId++, studentId: sid,
+    type:     document.getElementById('fee-type').value,
+    amount:   parseFloat(amount).toFixed(2),
+    date,
+    status:   document.getElementById('fee-status').value,
+    bookRef:  document.getElementById('fee-book-ref').value.trim(),
+    remarks:  document.getElementById('fee-remarks').value.trim()
+  };
+  fees.push(entry); saveExtra();
+  closeModal('addFeeModal'); renderFeesTable();
+  ['fee-amount','fee-book-ref','fee-remarks'].forEach(id => document.getElementById(id).value = '');
+  toast('Fee receipt added! Receipt No: F' + entry.receiptNo);
+}
+
+function markFeePaid(id) {
+  const f = fees.find(x => x.id === id);
+  if (f) { f.status = 'paid'; saveExtra(); renderFeesTable(); toast('Marked as paid ✅'); }
+}
+function markFeeWaived(id) {
+  const f = fees.find(x => x.id === id);
+  if (f) { f.status = 'waived'; saveExtra(); renderFeesTable(); toast('Fee waived'); }
+}
+function deleteFee(id) {
+  if (!confirm('Delete this fee entry?')) return;
+  fees = fees.filter(f => f.id !== id);
+  saveExtra(); renderFeesTable();
+}
+function exportFeesCSV() {
+  const rows = [['Receipt No','Student','Class','Type','Amount','Date','Status','Remarks']];
+  fees.forEach(f => {
+    const s = students.find(x => x.id === f.studentId);
+    rows.push(['F'+f.receiptNo, s?.name||'?', s?.cls||'?', f.type, f.amount, f.date, f.status, f.remarks||'']);
+  });
+  const csv = rows.map(r => r.map(c => '"'+(c||'')+'"').join(',')).join('\n');
+  const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'fee_receipts_' + today() + '.csv'; a.click();
+  toast('Fees exported!');
+}
+
+// =================== RESERVATIONS ===================
+function renderReservations() {
+  const q = (document.getElementById('res-search')?.value || '').toLowerCase();
+  const st = document.getElementById('res-filter')?.value || '';
+  const filtered = reservations.filter(r => {
+    const s = students.find(x => x.id === r.studentId);
+    const b = books.find(x => x.id === r.bookId);
+    const matchQ = !q || (s?.name.toLowerCase().includes(q) || b?.title.toLowerCase().includes(q));
+    return matchQ && (!st || r.status === st);
+  });
+  const tbody = document.getElementById('reservations-table');
+  if (!tbody) return;
+  tbody.innerHTML = filtered.length ? filtered.reverse().map(r => {
+    const s = students.find(x => x.id === r.studentId);
+    const b = books.find(x => x.id === r.bookId);
+    const stCls = r.status === 'fulfilled' ? 'badge-green' : r.status === 'cancelled' ? 'badge-red' : 'badge-yellow';
+    const avail = bookAvailable(r.bookId);
+    return `<tr>
+      <td><span class="chip">RES-${r.resNo}</span></td>
+      <td><strong>${s?.name||'?'}</strong></td>
+      <td>${s?.cls||'?'}</td>
+      <td>${b?.title||'?'} ${avail > 0 ? '<span class="badge badge-green">Available now!</span>' : ''}</td>
+      <td>${fmtDate(r.date)}</td>
+      <td><span class="badge ${stCls}">${r.status}</span></td>
+      <td class="action-row">
+        ${r.status === 'pending' ? `
+          <button class="btn btn-success btn-sm" onclick="fulfillReservation('${r.id}')">✓ Fulfill</button>
+          <button class="btn btn-danger btn-sm" onclick="cancelReservation('${r.id}')">✕ Cancel</button>` : ''}
+      </td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="7"><div class="empty-state">No reservations found</div></td></tr>';
+}
+
+function populateReservationDropdowns() {
+  const ss = '<option value="">-- Select Student --</option>' + students.map(s => `<option value="${s.id}">${s.name} (${s.adm}, ${s.cls})</option>`).join('');
+  const bs = '<option value="">-- Select Book --</option>' + books.map(b => {
+    const avail = bookAvailable(b.id);
+    return `<option value="${b.id}">${b.title} (${avail > 0 ? avail + ' available' : 'Not available'})</option>`;
+  }).join('');
+  const rs = document.getElementById('res-student'); if (rs) rs.innerHTML = ss;
+  const rb = document.getElementById('res-book');    if (rb) rb.innerHTML = bs;
+}
+
+function addReservation() {
+  const sid = document.getElementById('res-student')?.value;
+  const bid = document.getElementById('res-book')?.value;
+  if (!sid) return toast('Select a student', 'danger');
+  if (!bid) return toast('Select a book', 'danger');
+  if (reservations.some(r => r.studentId === sid && r.bookId === bid && r.status === 'pending'))
+    return toast('Student already has a pending reservation for this book', 'danger');
+  const res = {
+    id: uid(), resNo: nextResId++, studentId: sid, bookId: bid,
+    date:     document.getElementById('res-date')?.value || today(),
+    expected: document.getElementById('res-expected')?.value || '',
+    notes:    document.getElementById('res-notes')?.value || '',
+    status:   'pending'
+  };
+  reservations.push(res); saveExtra();
+  closeModal('addReservationModal'); renderReservations();
+  toast('Reservation created! RES-' + res.resNo);
+}
+
+function fulfillReservation(id) {
+  const r = reservations.find(x => x.id === id);
+  if (r) { r.status = 'fulfilled'; saveExtra(); renderReservations(); toast('Reservation fulfilled ✅'); }
+}
+function cancelReservation(id) {
+  const r = reservations.find(x => x.id === id);
+  if (r) { r.status = 'cancelled'; saveExtra(); renderReservations(); toast('Reservation cancelled'); }
+}
+
+// =================== CATEGORIES & LANGUAGES ===================
+function renderCategories() {
+  const tl = document.getElementById('cat-types-list');
+  const cl = document.getElementById('categories-list');
+  const ll = document.getElementById('languages-list');
+  if (tl) tl.innerHTML = catTypes.map((t,i) => `<div class="bulk-item">
+    <span style="flex:1;">${t}</span>
+    <button class="btn btn-danger btn-sm" onclick="deleteCatType(${i})">🗑</button>
+  </div>`).join('') || '<div class="text-muted" style="padding:10px;">None added</div>';
+  if (cl) cl.innerHTML = categories.map((c,i) => `<div class="bulk-item">
+    <span class="badge badge-blue" style="flex:1;">${c}</span>
+    <button class="btn btn-danger btn-sm" onclick="deleteCategory(${i})">🗑</button>
+  </div>`).join('') || '<div class="text-muted" style="padding:10px;">None added</div>';
+  if (ll) ll.innerHTML = languages.map((l,i) => `<div class="bulk-item">
+    <span class="badge badge-green" style="flex:1;">${l}</span>
+    <button class="btn btn-danger btn-sm" onclick="deleteLanguage(${i})">🗑</button>
+  </div>`).join('') || '<div class="text-muted" style="padding:10px;">None added</div>';
+}
+
+function addCatType() {
+  const v = prompt('Enter new category type:'); if (!v) return;
+  catTypes.push(v.trim()); saveExtra(); renderCategories(); toast('Category type added!');
+}
+function deleteCatType(i) { catTypes.splice(i,1); saveExtra(); renderCategories(); }
+function addCategory() {
+  const v = prompt('Enter new category:'); if (!v) return;
+  categories.push(v.trim()); saveExtra(); renderCategories(); toast('Category added!');
+}
+function deleteCategory(i) { categories.splice(i,1); saveExtra(); renderCategories(); }
+function addLanguage() {
+  const v = prompt('Enter new language:'); if (!v) return;
+  languages.push(v.trim()); saveExtra(); renderCategories(); toast('Language added!');
+}
+function deleteLanguage(i) { languages.splice(i,1); saveExtra(); renderCategories(); }
+
+// =================== BARCODES ===================
+let selectedBarcodeItems = new Set();
+
+function renderBarcodeList() {
+  const type = document.getElementById('barcode-type')?.value || 'books';
+  const q = (document.getElementById('barcode-search')?.value || '').toLowerCase();
+  const items = type === 'books'
+    ? books.filter(b => !q || b.title.toLowerCase().includes(q) || b.hsn.toLowerCase().includes(q))
+    : students.filter(s => !q || s.name.toLowerCase().includes(q) || s.adm.toLowerCase().includes(q));
+  const container = document.getElementById('barcode-list');
+  if (!container) return;
+  container.innerHTML = items.map(item => {
+    const label = type === 'books' ? item.title : item.name;
+    const code  = type === 'books' ? item.hsn   : item.adm;
+    return `<div class="bulk-item">
+      <input type="checkbox" id="bc-${item.id}" ${selectedBarcodeItems.has(item.id)?'checked':''}
+        onchange="toggleBarcodeItem('${item.id}',this.checked)">
+      <label for="bc-${item.id}" style="flex:1;cursor:pointer;">
+        <strong>${label}</strong><br>
+        <span class="text-muted" style="font-size:0.78rem;">${code}</span>
+      </label>
+    </div>`;
+  }).join('') || '<div class="empty-state">Nothing found</div>';
+  renderBarcodePreview();
+}
+
+function toggleBarcodeItem(id, checked) {
+  if (checked) selectedBarcodeItems.add(id); else selectedBarcodeItems.delete(id);
+  renderBarcodePreview();
+}
+function barcodeSelectAll() {
+  const type = document.getElementById('barcode-type')?.value || 'books';
+  (type === 'books' ? books : students).forEach(x => selectedBarcodeItems.add(x.id));
+  renderBarcodeList();
+}
+function barcodeClearAll() { selectedBarcodeItems.clear(); renderBarcodeList(); }
+
+function renderBarcodePreview() {
+  const type = document.getElementById('barcode-type')?.value || 'books';
+  const preview = document.getElementById('barcode-preview');
+  if (!preview) return;
+  const items = type === 'books'
+    ? books.filter(b => selectedBarcodeItems.has(b.id))
+    : students.filter(s => selectedBarcodeItems.has(s.id));
+  if (!items.length) { preview.innerHTML = '<div class="text-muted" style="padding:20px;">Select items from the left to preview barcodes</div>'; return; }
+  preview.innerHTML = items.map(item => {
+    const label = type === 'books' ? item.title : item.name;
+    const code  = type === 'books' ? item.hsn   : item.adm;
+    const sub   = type === 'books' ? (item.author||'') : (item.cls||'');
+    const bars  = generateBarSVG(code);
+    return `<div style="border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;width:160px;background:white;">
+      <div style="font-size:0.72rem;font-weight:700;color:#111;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${label}</div>
+      <div style="margin:4px 0;">${bars}</div>
+      <div style="font-family:monospace;font-size:0.7rem;color:#111;letter-spacing:1px;">${code}</div>
+      ${sub ? `<div style="font-size:0.65rem;color:#555;margin-top:2px;">${sub}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function generateBarSVG(code) {
+  // Simple visual barcode representation
+  let bars = '';
+  const w = 120, h = 40;
+  let x = 2;
+  for (let i = 0; i < code.length; i++) {
+    const c = code.charCodeAt(i);
+    const narrow = 2, wide = 4;
+    const widths = [narrow,wide,narrow,wide,narrow];
+    widths.forEach((bw, j) => {
+      const fill = (c + j) % 3 === 0 ? '#fff' : '#111';
+      bars += `<rect x="${x}" y="0" width="${bw}" height="${h}" fill="${fill}"/>`;
+      x += bw + 1;
+    });
+  }
+  return `<svg width="${w}" height="${h}" style="background:white;display:block;margin:0 auto;">${bars}</svg>`;
+}
+
+function printBarcodes() {
+  const type = document.getElementById('barcode-type')?.value || 'books';
+  const items = type === 'books'
+    ? books.filter(b => selectedBarcodeItems.has(b.id))
+    : students.filter(s => selectedBarcodeItems.has(s.id));
+  if (!items.length) return toast('Select items to print', 'danger');
+  const content = items.map(item => {
+    const label = type === 'books' ? item.title : item.name;
+    const code  = type === 'books' ? item.hsn   : item.adm;
+    const sub   = type === 'books' ? (item.author||'') : (item.cls||'');
+    const bars  = generateBarSVG(code);
+    return `<div style="display:inline-block;border:1px solid #ccc;border-radius:6px;padding:8px;margin:6px;text-align:center;width:150px;vertical-align:top;">
+      <div style="font-size:10px;font-weight:700;color:#111;margin-bottom:4px;">${label}</div>
+      ${bars}
+      <div style="font-family:monospace;font-size:9px;color:#111;letter-spacing:1px;">${code}</div>
+      ${sub ? `<div style="font-size:8px;color:#555;">${sub}</div>` : ''}
+    </div>`;
+  }).join('');
+  const w = window.open('','_blank');
+  w.document.write(`<html><head><title>Barcodes — Brainz Edu World</title>
+    <style>body{font-family:Arial,sans-serif;padding:20px;} @media print{button{display:none}}</style></head>
+    <body><h3 style="color:#1a6fe8">Brainz Edu World — Library Barcodes</h3>
+    <p style="font-size:12px;color:#666;">${items.length} barcode(s) — ${new Date().toLocaleDateString()}</p>
+    <div style="text-align:center;">${content}</div>
+    <br><button onclick="window.print()" style="background:#1a6fe8;color:#fff;padding:8px 20px;border:none;border-radius:6px;cursor:pointer;font-size:14px;">🖨️ Print</button>
+    </body></html>`);
+  w.document.close();
+}
+
+
 // =================== AUTH & ROLES ===================
 const USERS = [
   { username:'admin',     password:'admin123', name:'Admin One',    role:'admin',    color:'#1d4ed8' },
@@ -2328,20 +3392,29 @@ const USERS = [
 
 // Role → allowed pages
 const ROLE_PAGES = {
-  admin:    ['dashboard','books','students','issue','bulk','returns','records','import'],
-  operator: ['dashboard','issue','bulk','returns','records'],
+  admin:    ['dashboard','books','students','issue','bulk','returns','records','import',
+             'renew','location','barcode','publishers','fees','vendors','reservations','categories','languages'],
+  operator: ['dashboard','issue','bulk','returns','records','renew','reservations','fees'],
 };
 
 // Nav items definition
 const NAV_ITEMS = [
-  { id:'dashboard', icon:'🏠', label:'Dashboard',       section:null },
-  { id:'books',     icon:'📖', label:'Books Stock',     section:'Library' },
-  { id:'students',  icon:'🎓', label:'Students',        section:'Library' },
-  { id:'issue',     icon:'➕', label:'Issue Book',      section:'Circulation' },
-  { id:'bulk',      icon:'📦', label:'Bulk Issue/Return',section:'Circulation' },
-  { id:'returns',   icon:'↩️', label:'Returns',         section:'Circulation' },
-  { id:'records',   icon:'📋', label:'All Records',     section:'Circulation' },
-  { id:'import',    icon:'📥', label:'Import Excel',    section:'Data' },
+  { id:'dashboard',    icon:'🏠', label:'Dashboard',          section:null },
+  { id:'books',        icon:'📖', label:'Books Stock',        section:'Library' },
+  { id:'students',     icon:'🎓', label:'Students',           section:'Library' },
+  { id:'publishers',   icon:'🏢', label:'Publishers',         section:'Library' },
+  { id:'vendors',      icon:'🛒', label:'Vendors',            section:'Library' },
+  { id:'categories',   icon:'🏷️', label:'Categories & Lang',  section:'Library' },
+  { id:'location',     icon:'📍', label:'Location Resources', section:'Library' },
+  { id:'issue',        icon:'➕', label:'Issue Book',         section:'Circulation' },
+  { id:'bulk',         icon:'📦', label:'Bulk Issue/Return',  section:'Circulation' },
+  { id:'returns',      icon:'↩️', label:'Returns',            section:'Circulation' },
+  { id:'renew',        icon:'🔄', label:'Renew Book',         section:'Circulation' },
+  { id:'reservations', icon:'🔖', label:'Reservations',       section:'Circulation' },
+  { id:'fees',         icon:'💰', label:'Fee Receipts',       section:'Circulation' },
+  { id:'records',      icon:'📋', label:'All Records',        section:'Circulation' },
+  { id:'barcode',      icon:'🔲', label:'Generate Barcodes',  section:'Data' },
+  { id:'import',       icon:'📥', label:'Import Excel',       section:'Data' },
 ];
 
 let currentUser = null;
@@ -2397,7 +3470,7 @@ function buildNav() {
     </button>`;
   });
   // Logout at bottom
-  html += `<div style="margin-top:auto;padding-top:12px;border-top:1px solid var(--border);margin-top:16px;">
+  html += `<div style="margin-top:16px;padding-top:10px;border-top:1px solid var(--border);">
     <button class="nav-btn" onclick="doLogout()" style="color:var(--danger);">
       <span class="icon">🚪</span> Sign Out
     </button>
